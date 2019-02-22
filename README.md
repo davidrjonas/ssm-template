@@ -1,13 +1,13 @@
 ssm-template
 ============
 
-A simple template renderer with support for [AWS Systems Manager Parameter Store](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-paramstore.html). Based on the venerable [confd](https://github.com/kelseyhightower/confd), dramatically simplified, adding [Masterminds sprig functions](https://github.com/Masterminds/sprig)_.
+A simple template renderer with support for [AWS Systems Manager Parameter Store](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-paramstore.html). Based on the venerable [confd](https://github.com/kelseyhightower/confd), dramatically simplified, adding [Masterminds sprig functions](https://github.com/Masterminds/sprig).
 
 Resources
 ---------
 
 - [confd template functions](https://github.com/kelseyhightower/confd/blob/master/docs/templates.md)
-- [sprig template functions](http://masterminds.github.io/sprig/))
+- [sprig template functions](http://masterminds.github.io/sprig/)
 
 Usage
 -----
