@@ -1,15 +1,16 @@
 language: go
 go:
-- "1.11"
+  - "1.11"
 
 os:
   - linux
   - osx
 
-install: true
+env:
+  - GO111MODULE=on
 
-before_script:
-  - go mod download
+script:
+  - go build .
 
 deploy:
   provider: releases
