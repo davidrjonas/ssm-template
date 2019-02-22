@@ -1,0 +1,18 @@
+language: go
+go:
+- 1.11
+
+os:
+  - linux
+  - osx
+
+install: true
+
+deploy:
+  provider: releases
+  api_key:
+    secure: iXB39YjuyTCanQjp4SFA3IRLswcpFyIwTWg4DKfuCm1w7qnVtu2K++BSo2NY10X3UE9BTf/xo71vTDo8/b8zCQ1HvU1s8gBnUKVq7maOEN9SCgQc3h/0XIzE7TbQKQy6bZnFsFYSBG2q8fJ/gHvNacZwQph78vl5x2SOeY24h2B+As4r422p/QrcezdcybCytTpcVydn6odjsOYpgdL4P1pmUvGrBZNEJ+5jpy4an+gJy/z/QMhUR2X4KtXaSK+Kb3kZvWFwjN71yWtnLhSIRpJ2+NTxzzWaJwuORG0ChdveEa70tXr8DB2UkAeqfeOWFnlMt6XXfvRlWyHeSWt+l97uzpBE/Whl/qumZnWBpjPkOHBsF5bPbMjj9iisSkptWtNy30GIvxECShJFpFkZMHgPpnqpjf+pu4INq/zsc2kmQoh0eGkihBkKsNkWvfug57BoZqfV75XnYetcrEaj3Q0nDOU8X0Bv6dTDJDQ6kzncbd3W6y+WDHorXF7/NElLyLcmAWI7OBfmBjtVi+JFzKmT7Ds/cQffFNFYWl02+nTrj2uMYn59PItdwQz/YGO0hnIfqDg+/Pr7VXLjLCN6RTlSnqz+juj9Vr+SMXRP5n4YBufJjM2aPMoCDo7I80FLbculpHE/ngTbpdqZBm8DTBWLGlNig4hSlQpJRtyijZA=
+  file: ssm-template
+  on:
+    repo: davidrjonas/ssm-template
+    tags: true
