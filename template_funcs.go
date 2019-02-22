@@ -1,6 +1,10 @@
 package main
 
-// From https://github.com/kelseyhightower/confd/blob/34a6ce889/resource/template/template_funcs.go
+// Ripped from https://github.com/kelseyhightower/confd/blob/34a6ce889/resource/template/template_funcs.go
+// since newFuncMap isn't exported. Also includes IsFileExist() from
+// https://github.com/kelseyhightower/confd/blob/34a6ce889/util/util.go so we
+// don't have to pull in the entire module.
+// Also removes the reliance on github.com/kelseyhightower/memkv since it only used the KVPair struct.
 
 import (
 	"encoding/base64"
@@ -14,8 +18,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/kelseyhightower/memkv"
 )
 
 func newFuncMap() map[string]interface{} {
@@ -71,7 +73,7 @@ func Seq(first, last int) []int {
 	return arr
 }
 
-type byLengthKV []memkv.KVPair
+type byLengthKV []KVPair
 
 func (s byLengthKV) Len() int {
 	return len(s)
@@ -85,7 +87,7 @@ func (s byLengthKV) Less(i, j int) bool {
 	return len(s[i].Key) < len(s[j].Key)
 }
 
-func SortKVByLength(values []memkv.KVPair) []memkv.KVPair {
+func SortKVByLength(values []KVPair) []KVPair {
 	sort.Sort(byLengthKV(values))
 	return values
 }
@@ -116,8 +118,8 @@ func Reverse(values interface{}) interface{} {
 		for left, right := 0, len(v)-1; left < right; left, right = left+1, right-1 {
 			v[left], v[right] = v[right], v[left]
 		}
-	case []memkv.KVPair:
-		v := values.([]memkv.KVPair)
+	case []KVPair:
+		v := values.([]KVPair)
 		for left, right := 0, len(v)-1; left < right; left, right = left+1, right-1 {
 			v[left], v[right] = v[right], v[left]
 		}
