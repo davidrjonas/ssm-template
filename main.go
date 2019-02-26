@@ -13,7 +13,7 @@ import (
 	confdssm "github.com/kelseyhightower/confd/backends/ssm"
 )
 
-type KVPair struct {
+type kvPair struct {
 	Key   string
 	Value string
 }
@@ -26,17 +26,17 @@ func main() {
 		os.Exit(1)
 	}
 
-	client, err := NewClient()
+	client, err := newClient()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "failed to create aws client:", err)
 		os.Exit(1)
 	}
 
 	tplfuncs := newFuncMap()
-	tplfuncs["get"] = client.Get
-	tplfuncs["gets"] = client.GetAll
-	tplfuncs["getv"] = client.GetValue
-	tplfuncs["getvs"] = client.GetAllValues
+	tplfuncs["get"] = client.get
+	tplfuncs["gets"] = client.getAll
+	tplfuncs["getv"] = client.getValue
+	tplfuncs["getvs"] = client.getAllValues
 
 	output := bytes.NewBuffer([]byte{})
 	err = template.Must(
@@ -51,29 +51,29 @@ func main() {
 	output.WriteTo(os.Stdout)
 }
 
-type Client struct {
+type client struct {
 	client *confdssm.Client
 }
 
-func NewClient() (*Client, error) {
+func newClient() (*client, error) {
 	c, err := confdssm.New()
 	if err != nil {
 		return nil, err
 	}
 
-	return &Client{client: c}, nil
+	return &client{client: c}, nil
 }
 
-func (c *Client) Get(name string) (interface{}, error) {
+func (c *client) get(name string) (interface{}, error) {
 	kv, err := c.client.GetValues([]string{name})
 	if err != nil {
 		return "", err
 	}
 
-	return KVPair{Key: name, Value: kv[name]}, nil
+	return kvPair{Key: name, Value: kv[name]}, nil
 }
 
-func (c *Client) GetValue(name string, v ...string) (interface{}, error) {
+func (c *client) getValue(name string, v ...string) (interface{}, error) {
 	kv, err := c.client.GetValues([]string{name})
 	if err != nil {
 		if len(v) > 0 {
@@ -85,24 +85,24 @@ func (c *Client) GetValue(name string, v ...string) (interface{}, error) {
 	return kv[name], nil
 }
 
-func (c *Client) GetAll(name string) (interface{}, error) {
+func (c *client) getAll(name string) (interface{}, error) {
 	kv, err := c.client.GetValues([]string{name})
 	if err != nil {
 		return "", err
 	}
 
-	ks := make([]KVPair, len(kv))
+	ks := make([]kvPair, len(kv))
 
 	i := 0
 	for k := range kv {
-		ks[i] = KVPair{Key: k, Value: kv[k]}
+		ks[i] = kvPair{Key: k, Value: kv[k]}
 		i++
 	}
 
 	return ks, nil
 }
 
-func (c *Client) GetAllValues(name string) (interface{}, error) {
+func (c *client) getAllValues(name string) (interface{}, error) {
 	kv, err := c.client.GetValues([]string{name})
 	if err != nil {
 		return "", err

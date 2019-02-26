@@ -24,11 +24,11 @@ func newFuncMap() map[string]interface{} {
 	m := make(map[string]interface{})
 	m["base"] = path.Base
 	m["split"] = strings.Split
-	m["json"] = UnmarshalJsonObject
-	m["jsonArray"] = UnmarshalJsonArray
+	m["json"] = unmarshalJSONObject
+	m["jsonArray"] = unmarshalJSONArray
 	m["dir"] = path.Dir
-	m["map"] = CreateMap
-	m["getenv"] = Getenv
+	m["map"] = createMap
+	m["getenv"] = getenv
 	m["join"] = strings.Join
 	m["datetime"] = time.Now
 	m["toUpper"] = strings.ToUpper
@@ -36,23 +36,23 @@ func newFuncMap() map[string]interface{} {
 	m["contains"] = strings.Contains
 	m["replace"] = strings.Replace
 	m["trimSuffix"] = strings.TrimSuffix
-	m["lookupIP"] = LookupIP
-	m["lookupIPV4"] = LookupIPV4
-	m["lookupIPV6"] = LookupIPV6
-	m["lookupSRV"] = LookupSRV
-	m["fileExists"] = IsFileExist
-	m["base64Encode"] = Base64Encode
-	m["base64Decode"] = Base64Decode
+	m["lookupIP"] = lookupIP
+	m["lookupIPV4"] = lookupIPV4
+	m["lookupIPV6"] = lookupIPV6
+	m["lookupSRV"] = lookupSRV
+	m["fileExists"] = isFileExist
+	m["base64Encode"] = base64Encode
+	m["base64Decode"] = base64Decode
 	m["parseBool"] = strconv.ParseBool
-	m["reverse"] = Reverse
-	m["sortByLength"] = SortByLength
-	m["sortKVByLength"] = SortKVByLength
+	m["reverse"] = reverse
+	m["sortByLength"] = sortByLength
+	m["sortKVByLength"] = sortKVByLength
 	m["add"] = func(a, b int) int { return a + b }
 	m["sub"] = func(a, b int) int { return a - b }
 	m["div"] = func(a, b int) int { return a / b }
 	m["mod"] = func(a, b int) int { return a % b }
 	m["mul"] = func(a, b int) int { return a * b }
-	m["seq"] = Seq
+	m["seq"] = seq
 	m["atoi"] = strconv.Atoi
 	return m
 }
@@ -65,7 +65,7 @@ func addFuncs(out, in map[string]interface{}) {
 
 // Seq creates a sequence of integers. It's named and used as GNU's seq.
 // Seq takes the first and the last element as arguments. So Seq(3, 5) will generate [3,4,5]
-func Seq(first, last int) []int {
+func seq(first, last int) []int {
 	var arr []int
 	for i := first; i <= last; i++ {
 		arr = append(arr, i)
@@ -73,7 +73,7 @@ func Seq(first, last int) []int {
 	return arr
 }
 
-type byLengthKV []KVPair
+type byLengthKV []kvPair
 
 func (s byLengthKV) Len() int {
 	return len(s)
@@ -87,7 +87,7 @@ func (s byLengthKV) Less(i, j int) bool {
 	return len(s[i].Key) < len(s[j].Key)
 }
 
-func SortKVByLength(values []KVPair) []KVPair {
+func sortKVByLength(values []kvPair) []kvPair {
 	sort.Sort(byLengthKV(values))
 	return values
 }
@@ -104,22 +104,22 @@ func (s byLength) Less(i, j int) bool {
 	return len(s[i]) < len(s[j])
 }
 
-func SortByLength(values []string) []string {
+func sortByLength(values []string) []string {
 	sort.Sort(byLength(values))
 	return values
 }
 
 //Reverse returns the array in reversed order
-//works with []string and []KVPair
-func Reverse(values interface{}) interface{} {
+//works with []string and []kvPair
+func reverse(values interface{}) interface{} {
 	switch values.(type) {
 	case []string:
 		v := values.([]string)
 		for left, right := 0, len(v)-1; left < right; left, right = left+1, right-1 {
 			v[left], v[right] = v[right], v[left]
 		}
-	case []KVPair:
-		v := values.([]KVPair)
+	case []kvPair:
+		v := values.([]kvPair)
 		for left, right := 0, len(v)-1; left < right; left, right = left+1, right-1 {
 			v[left], v[right] = v[right], v[left]
 		}
@@ -130,7 +130,7 @@ func Reverse(values interface{}) interface{} {
 // Getenv retrieves the value of the environment variable named by the key.
 // It returns the value, which will the default value if the variable is not present.
 // If no default value was given - returns "".
-func Getenv(key string, v ...string) string {
+func getenv(key string, v ...string) string {
 	defaultValue := ""
 	if len(v) > 0 {
 		defaultValue = v[0]
@@ -145,7 +145,7 @@ func Getenv(key string, v ...string) string {
 
 // CreateMap creates a key-value map of string -> interface{}
 // The i'th is the key and the i+1 is the value
-func CreateMap(values ...interface{}) (map[string]interface{}, error) {
+func createMap(values ...interface{}) (map[string]interface{}, error) {
 	if len(values)%2 != 0 {
 		return nil, errors.New("invalid map call")
 	}
@@ -160,19 +160,19 @@ func CreateMap(values ...interface{}) (map[string]interface{}, error) {
 	return dict, nil
 }
 
-func UnmarshalJsonObject(data string) (map[string]interface{}, error) {
+func unmarshalJSONObject(data string) (map[string]interface{}, error) {
 	var ret map[string]interface{}
 	err := json.Unmarshal([]byte(data), &ret)
 	return ret, err
 }
 
-func UnmarshalJsonArray(data string) ([]interface{}, error) {
+func unmarshalJSONArray(data string) ([]interface{}, error) {
 	var ret []interface{}
 	err := json.Unmarshal([]byte(data), &ret)
 	return ret, err
 }
 
-func LookupIP(data string) []string {
+func lookupIP(data string) []string {
 	ips, err := net.LookupIP(data)
 	if err != nil {
 		return nil
@@ -187,9 +187,9 @@ func LookupIP(data string) []string {
 	return ipStrings
 }
 
-func LookupIPV6(data string) []string {
+func lookupIPV6(data string) []string {
 	var addresses []string
-	for _, ip := range LookupIP(data) {
+	for _, ip := range lookupIP(data) {
 		if strings.Contains(ip, ":") {
 			addresses = append(addresses, ip)
 		}
@@ -197,9 +197,9 @@ func LookupIPV6(data string) []string {
 	return addresses
 }
 
-func LookupIPV4(data string) []string {
+func lookupIPV4(data string) []string {
 	var addresses []string
-	for _, ip := range LookupIP(data) {
+	for _, ip := range lookupIP(data) {
 		if strings.Contains(ip, ".") {
 			addresses = append(addresses, ip)
 		}
@@ -223,7 +223,7 @@ func (s sortSRV) Less(i, j int) bool {
 	return str1 < str2
 }
 
-func LookupSRV(service, proto, name string) []*net.SRV {
+func lookupSRV(service, proto, name string) []*net.SRV {
 	_, addrs, err := net.LookupSRV(service, proto, name)
 	if err != nil {
 		return []*net.SRV{}
@@ -232,17 +232,17 @@ func LookupSRV(service, proto, name string) []*net.SRV {
 	return addrs
 }
 
-func Base64Encode(data string) string {
+func base64Encode(data string) string {
 	return base64.StdEncoding.EncodeToString([]byte(data))
 }
 
-func Base64Decode(data string) (string, error) {
+func base64Decode(data string) (string, error) {
 	s, err := base64.StdEncoding.DecodeString(data)
 	return string(s), err
 }
 
 // From https://github.com/kelseyhightower/confd/blob/34a6ce889/util/util.go so we don't have to pull in the entire module.
-func IsFileExist(fpath string) bool {
+func isFileExist(fpath string) bool {
 	if _, err := os.Stat(fpath); os.IsNotExist(err) {
 		return false
 	}
