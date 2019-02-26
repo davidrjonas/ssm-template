@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -18,7 +19,7 @@ type KVPair struct {
 }
 
 func main() {
-	bytes, err := ioutil.ReadAll(os.Stdin)
+	input, err := ioutil.ReadAll(os.Stdin)
 
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "reading standard input:", err)
@@ -37,14 +38,17 @@ func main() {
 	tplfuncs["getv"] = client.GetValue
 	tplfuncs["getvs"] = client.GetAllValues
 
+	output := bytes.NewBuffer([]byte{})
 	err = template.Must(
-		template.New("stdin").Funcs(sprig.TxtFuncMap()).Funcs(tplfuncs).Parse(string(bytes)),
-	).Execute(os.Stdout, "none")
+		template.New("stdin").Funcs(sprig.TxtFuncMap()).Funcs(tplfuncs).Parse(string(input)),
+	).Execute(output, "none")
 
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "failed to render template: ", err)
 		os.Exit(1)
 	}
+
+	output.WriteTo(os.Stdout)
 }
 
 type Client struct {
